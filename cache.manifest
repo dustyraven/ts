@@ -1,0 +1,16 @@
+CACHE MANIFEST
+
+# cache manifest Version 1.0.2
+
+NETWORK:
+*
+
+CACHE:
+//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css
+//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css
+//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js
+//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js
+http://code.highcharts.com/highcharts.js
+http://code.highcharts.com/highcharts-more.js
+http://code.highcharts.com/modules/exporting.js
+js/howler.min.js
