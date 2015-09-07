@@ -1,10 +1,13 @@
 #!/usr/bin/python
-import sys
-import datetime
+import os, sys, datetime
 import Adafruit_DHT
 import RPi.GPIO as GPIO
+import ConfigParser
 
-GPIO.setmode(GPIO.BCM)
+# HELPERS
+
+def now():
+	return datetime.datetime.now()
 
 def getsens( pin ):
 
@@ -15,33 +18,49 @@ def getsens( pin ):
 
     return t, h
 
-ts_start = datetime.datetime.now()
+# SETUP
 
-t1, h1 = getsens(17)
-t2, h2 = getsens(18)
-t3, h3 = getsens(23)
+ts_start = now()
+pwd = os.path.dirname(os.path.realpath(__file__))
+ini = os.path.join(pwd,'terrasens.ini')
 
-ts_end = datetime.datetime.now()
+Config = ConfigParser.ConfigParser()
+Config.read(ini)
+
+pin_warm = Config.get('sensors', 'pin_warm')
+pin_cold = Config.get('sensors', 'pin_cold')
+pin_room = Config.get('sensors', 'pin_room')
+
+
+# ACTION
+
+GPIO.setmode(GPIO.BCM)
+
+t_warm, h_warm = getsens(pin_warm)
+t_cold, h_cold = getsens(pin_cold)
+t_room, h_room = getsens(pin_room)
+
+ts_end = now()
 ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
-print ts, ts_diff, t1, h1, t2, h2, t3, h3
+print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room
 
-t2 = float(t2)
+t_warm = float(t_warm)
 
-h_avg = (float(h1) + float(h2)) / 2
+h_avg = (float(h_cold) + float(h_warm)) / 2
 
 GPIO.setwarnings(False)
 
-if t2 > 30:
+if t_warm > 30:
     GPIO.setup(22, GPIO.IN)
-if t2 < 28:
+if t_warm < 28:
     GPIO.setup(22, GPIO.OUT)
 
-if h_avg > 65:
+if h_avg > 60:
     GPIO.setup(25, GPIO.IN)
-if h_avg < 60:
+if h_avg < 55:
     GPIO.setup(25, GPIO.OUT)
 
 sys.exit(0)

@@ -161,7 +161,7 @@ $t3 = implode(',', $t3);
 	<style type="text/css">
 		body {background:black;}
 		h1, h2 {color:white;text-shadow: 1px 1px 0 red;font-weight:bold;}
-		#updBtn {position:relative; top:-5px;}
+		h1 button.btn {position:relative; top:-5px;}
 
 		.progress {height:28px;text-shadow: 1px 1px 1px black, -1px -1px 1px black;font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
 		.progress-bar {font-size:26px;line-height:30px;text-align:left;padding-left:1em;background-color:#AAA;white-space:nowrap;}
@@ -182,6 +182,9 @@ $t3 = implode(',', $t3);
 		<button id="updBtn" class="btn btn-sm btn-default" onclick="reData();">
 			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		</button>
+		<a id="chartsBtn" class="btn btn-sm btn-default pull-right" href="#">
+			&nbsp; <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> &nbsp;
+		</a>
 	</h1>
 
 	<h2 id="ts" class="text-center"></h2>
@@ -196,6 +199,9 @@ $t3 = implode(',', $t3);
 		<div class="progress">
 			<div id="tempR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b></div>
 		</div>
+
+		<hr />
+
 		<div class="progress">
 			<div id="hmdtH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b>%</div>
 		</div>
@@ -259,9 +265,9 @@ function reData()
 		var tc = percRange(data.last.tc, 10, 40);// 2* ,
 			th = percRange(data.last.th, 10, 40);// 2* ,
 			tr = percRange(data.last.tr, 10, 40);// 2* ,
-			hc = percRange(data.last.hc, 30, 99);// ,
-			hh = percRange(data.last.hh, 30, 99);// ,
-			hr = percRange(data.last.hr, 30, 99);// ;
+			hc = percRange(data.last.hc, 20, 90);// ,
+			hh = percRange(data.last.hh, 20, 90);// ,
+			hr = percRange(data.last.hr, 20, 60);// ;
 
 
 		$("#ts").text(data.last.ts);
@@ -291,6 +297,15 @@ function reData()
 		else
 			$("#tempC").addClass("progress-bar-success")
 
+		// room
+		if(data.last.tr < data.settings.temperature.room_min)
+			$("#tempR").addClass("progress-bar-info")
+		else if(data.last.tr > data.settings.temperature.room_max)
+			$("#tempR").addClass("progress-bar-danger")
+		else
+			$("#tempR").addClass("progress-bar-success")
+
+
 
 
 		if(data.last.hh < data.settings.humidity.warm_min)
@@ -306,6 +321,13 @@ function reData()
 			$("#hmdtC").addClass("progress-bar-info")
 		else
 			$("#hmdtC").addClass("progress-bar-success")
+
+		if(data.last.hr < data.settings.humidity.room_min)
+			$("#hmdtR").addClass("progress-bar-info")
+		else if(data.last.hr > data.settings.humidity.room_max)
+			$("#hmdtR").addClass("progress-bar-danger")
+		else
+			$("#hmdtR").addClass("progress-bar-success")
 
 		//chartNow.setTitle({text: data.last.ts});
 

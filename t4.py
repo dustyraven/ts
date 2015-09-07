@@ -1,16 +1,22 @@
 import os, sys, datetime
-
+import ConfigParser
 
 def now():
-	print testing
 	return datetime.datetime.now()
 
 print sys.path[0]
 
 testing = "AAA BBB CCC"
 
-print os.path.join(os.path.dirname(os.path.realpath(__file__)),"output","log.txt")
 
-print now()
+pwd = os.path.dirname(os.path.realpath(__file__))
+ini = os.path.join(pwd,'terrasens.ini')
+
+Config = ConfigParser.ConfigParser()
+Config.read(ini)
+
+
+print Config.get('temperature', 'room_max')
+
 
 
