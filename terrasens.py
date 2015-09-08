@@ -18,6 +18,20 @@ def getsens( pin ):
 
     return t, h
 
+
+def setCtrl(pinNum, state):
+    if 0 == state:
+        GPIO.setup(int(pinNum), GPIO.IN)
+    elif 1 == state:
+        GPIO.setup(int(pinNum), GPIO.OUT)
+    else:
+        pass
+
+def getCtrl(pinNum):
+    return int(GPIO.gpio_function(int(pinNum)) == GPIO.OUT)
+
+
+
 # SETUP
 
 ts_start = now()
@@ -31,10 +45,20 @@ pin_warm = Config.get('sensors', 'pin_warm')
 pin_cold = Config.get('sensors', 'pin_cold')
 pin_room = Config.get('sensors', 'pin_room')
 
+warm_min = Config.get('temperature', 'warm_min')
+warm_max = Config.get('temperature', 'warm_max')
+
+h_avg_min = Config.get('humidity', 'avg_min')
+h_avg_max = Config.get('humidity', 'avg_max')
+
+pin_heater = Config.get('control', 'pin_heater')
+pin_humidifier = Config.get('control', 'pin_humidifier')
+
 
 # ACTION
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 t_warm, h_warm = getsens(pin_warm)
 t_cold, h_cold = getsens(pin_cold)
@@ -45,23 +69,23 @@ ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
-print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room
 
-t_warm = float(t_warm)
-
+tempW = float(t_warm)
 h_avg = (float(h_cold) + float(h_warm)) / 2
 
-GPIO.setwarnings(False)
 
-if t_warm > 30:
-    GPIO.setup(22, GPIO.IN)
-if t_warm < 28:
-    GPIO.setup(22, GPIO.OUT)
+if tempW > warm_max:
+    setCtrl(pin_heater, 0)
+if tempW < warm_min:
+    setCtrl(pin_heater, 1)
 
-if h_avg > 60:
-    GPIO.setup(25, GPIO.IN)
-if h_avg < 55:
-    GPIO.setup(25, GPIO.OUT)
+if h_avg > h_avg_max:
+    setCtrl(pin_humidifier, 0)
+if h_avg < h_avg_min:
+    setCtrl(pin_humidifier, 1)
 
+print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, getCtrl(pin_heater), getCtrl(pin_humidifier)
+
+# print GPIO.gpio_function(25) == GPIO.IN
 sys.exit(0)
 

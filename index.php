@@ -49,7 +49,8 @@ $raw = array_slice($raw, -60, 60, true);
 
 $data = array();
 foreach($raw as $row)
-	$data[] = new Sensor($row);
+	if(preg_match('/^20[\d\s\.]+$/', $row))
+		$data[] = new Sensor($row);
 
 $last = end($data);
 
@@ -85,7 +86,7 @@ if(AJAX)
 
 	$data['ts'] = $ts;
 	$data['last'] = array(
-			'ts' =>	date('d.m.y H:i', $last->timestamp),
+			'ts' =>	date('H:i', $last->timestamp),
 			'tc' =>	$last->data[0]->T,
 			'th' =>	$last->data[1]->T,
 			'tr' =>	$last->data[2]->T,
@@ -94,7 +95,7 @@ if(AJAX)
 			'hr' =>	$last->data[2]->H,
 		);
 
-	//$data['test'] = var_export($h1,true);
+	$data['next'] = round((($last->timestamp + $last->work + 60) - time())*1000);
 
 	$data['settings'] = $settings;
 
@@ -160,11 +161,14 @@ $t3 = implode(',', $t3);
 	<![endif]-->
 	<style type="text/css">
 		body {background:black;}
-		h1, h2, a.navbar-brand {color:white;text-shadow: 1px 1px 0 red;font-weight:bold;}
+		h1, h2, a#navbar-brand {color:white;text-shadow: 1px 1px 0 red;font-weight:bold;}
+		a#navbar-brand {font-size:2em;}
 		h1 button.btn {position:relative; top:-5px;}
 
+		.sep {height:1.5em;border-top:1px dotted #444;}
+
 		.progress {height:28px;text-shadow: 1px 1px 1px black, -1px -1px 1px black;font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
-		.progress-bar {font-size:26px;line-height:30px;text-align:left;padding-left:1em;background-color:#AAA;white-space:nowrap;}
+		.progress-bar {font-size:26px;line-height:30px;text-align:left;padding-left:.5em;background-color:#AAA;white-space:nowrap;}
 		.progress-bar-success {background-color:green;}
 		.progress-bar-info {background-color:blue;}
 		.progress-bar-warning {background-color:yellow;}
@@ -180,75 +184,67 @@ $t3 = implode(',', $t3);
 	<div class="container-fluid">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbarcollapse" aria-expanded="false">
 				<span class="sr-only">Toggle navigation</span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand">TerraSens</a>
+			<a id="navbar-brand" class="navbar-brand">TerraSens</a>
+			<button id="updBtn" class="btn btn-default navbar-btn navbar-left" onclick="reData();">
+				<span id="ts"></span>
+				<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+			</button>
 		</div>
 
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-				<li><a href="#">Link</a></li>
-			</ul>
 
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbarcollapse">
 			<ul class="nav navbar-nav navbar-right">
-				<li>
-					<button id="updBtn" class="btn btn-default navbar-btn" onclick="reData();">
-						<span id="ts"></span>
-						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-					</button>
-				</li>
-				<li>&nbsp;</li>
-				<li>
-					<button type="button" class="btn btn-default navbar-btn">
-						&nbsp; <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> &nbsp;
-					</button>
-				</li>
+				<li><a href="#">Charts</a></li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->
 </nav>
 
 
-<div class="container">
+<div class="container-fluid">
 
-	<h1 class="text-center">
-		TerraSens
-		<button id="updBtn" class="btn btn-sm btn-default" onclick="reData();">
-			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		</button>
-		<a id="chartsBtn" class="btn btn-sm btn-default pull-right" href="#">
-			&nbsp; <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> &nbsp;
-		</a>
-	</h1>
+	<div class="row">
+		<div class="col-xs-12 sep"></div>
+	</div>
 
 
 	<div class="row">
-		<div class="progress">
-			<div id="tempH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b></div>
-		</div>
-		<div class="progress">
-			<div id="tempC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b></div>
-		</div>
-		<div class="progress">
-			<div id="tempR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b></div>
-		</div>
+		<div class="col-xs-12">
 
-		<hr />
+			<div class="progress">
+				<div id="tempH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b></div>
+			</div>
+			<div class="progress">
+				<div id="tempC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b></div>
+			</div>
+			<div class="progress">
+				<div id="tempR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b></div>
+			</div>
+		</div>
+	</div>
 
-		<div class="progress">
-			<div id="hmdtH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b>%</div>
-		</div>
-		<div class="progress">
-			<div id="hmdtC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b>%</div>
-		</div>
-		<div class="progress">
-			<div id="hmdtR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b>%</div>
+	<div class="row">
+		<div class="col-xs-12 sep"></div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="progress">
+				<div id="hmdtH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b>%</div>
+			</div>
+			<div class="progress">
+				<div id="hmdtC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b>%</div>
+			</div>
+			<div class="progress">
+				<div id="hmdtR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b>%</div>
+			</div>
 		</div>
 	</div>
 	<!--
@@ -395,7 +391,16 @@ function reData()
 		//console.log( data );
 		updBtn.show();
 		clearTimeout(tOut);
-		tOut = setTimeout(reData, 60000);
+
+		var ts = 60000, now = new Date().getTime();
+
+		if(data.next && data.next > 0)
+			ts = data.next;
+		else
+			console.log(data.next)
+
+		tOut = setTimeout(reData, ts);
+		//console.log(tOut);
 	});
 
 }
