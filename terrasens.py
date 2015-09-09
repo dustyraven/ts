@@ -21,14 +21,14 @@ def getsens( pin ):
 
 def setCtrl(pinNum, state):
     if 0 == state:
-        GPIO.setup(int(pinNum), GPIO.IN)
+        GPIO.setup(pinNum, GPIO.IN)
     elif 1 == state:
-        GPIO.setup(int(pinNum), GPIO.OUT)
+        GPIO.setup(pinNum, GPIO.OUT)
     else:
         pass
 
 def getCtrl(pinNum):
-    return int(GPIO.gpio_function(int(pinNum)) == GPIO.OUT)
+    return int(GPIO.gpio_function(pinNum) == GPIO.OUT)
 
 
 
@@ -37,22 +37,23 @@ def getCtrl(pinNum):
 ts_start = now()
 pwd = os.path.dirname(os.path.realpath(__file__))
 ini = os.path.join(pwd,'terrasens.ini')
+log = os.path.join(pwd,'logs','terrasens.log')
 
 Config = ConfigParser.ConfigParser()
 Config.read(ini)
 
-pin_warm = Config.get('sensors', 'pin_warm')
-pin_cold = Config.get('sensors', 'pin_cold')
-pin_room = Config.get('sensors', 'pin_room')
+pin_warm = int(Config.get('sensors', 'pin_warm'))
+pin_cold = int(Config.get('sensors', 'pin_cold'))
+pin_room = int(Config.get('sensors', 'pin_room'))
 
-warm_min = Config.get('temperature', 'warm_min')
-warm_max = Config.get('temperature', 'warm_max')
+warm_min = int(Config.get('temperature', 'warm_min'))
+warm_max = int(Config.get('temperature', 'warm_max'))
 
-h_avg_min = Config.get('humidity', 'avg_min')
-h_avg_max = Config.get('humidity', 'avg_max')
+h_avg_min = int(Config.get('humidity', 'avg_min'))
+h_avg_max = int(Config.get('humidity', 'avg_max'))
 
-pin_heater = Config.get('control', 'pin_heater')
-pin_humidifier = Config.get('control', 'pin_humidifier')
+pin_heater = int(Config.get('control', 'pin_heater'))
+pin_humidifier = int(Config.get('control', 'pin_humidifier'))
 
 
 # ACTION

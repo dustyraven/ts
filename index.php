@@ -282,15 +282,9 @@ var chartH, chartT, chartNow, tOut, updBtn;
 
 function reData()
 {
-	updBtn.hide();
+	//updBtn.hide();
+	$("#ts").text("");
 
-	$(".progress-bar").each(function( index ) {
-		$(this) .removeClass("progress-bar-success")
-				.removeClass("progress-bar-info")
-				.removeClass("progress-bar-warning")
-				.removeClass("progress-bar-danger")
-				.css("width", "1px");
-	});
 
 	var jqxhr = $.getJSON( "", function(data) {
 
@@ -315,6 +309,10 @@ function reData()
 		$("#hmdtR").css("width", hr + '%').find("b").text(data.last.hr);
 
 
+		$(".progress-bar").each(function( index ) {
+			$(this).removeClass("progress-bar-success progress-bar-info progress-bar-warning progress-bar-danger")
+					//.css("width", "1px");
+		});
 
 		// ideal - 32.2 (90F) .... cut some degrees for sensor height
 		if(data.last.th < data.settings.temperature.warm_min)
