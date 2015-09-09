@@ -18,6 +18,8 @@ class Sensor {
 	public $timestamp;
 	public $work;
 	public $data = array();
+	public $heater = 0;
+	public $humidifier = 0;
 
 	public function __construct($row)
 	{
@@ -28,6 +30,13 @@ class Sensor {
 		foreach($data as $k => $v)
 			if(0 == $k%2)
 				$this->data[] = (object)array('T' => (float)$data[$k], 'H' => (float)$data[$k+1]);
+
+		if(4 == count($this->data))
+		{
+			$tmp = array_pop($this->data);
+			$this->heater = $tmp->T;
+			$this->humidifier = $tmp->H;
+		}
 	}
 
 }	// end of class
@@ -96,6 +105,9 @@ if(AJAX)
 		);
 
 	$data['next'] = round((($last->timestamp + $last->work + 60) - time())*1000);
+
+	$data['heater'] = $last->heater;
+	$data['humidifier'] = $last->humidifier;
 
 	$data['settings'] = $settings;
 
@@ -483,15 +495,15 @@ function snd(s)
 
 			series: [
 			{
-				name: 'Humidity cold',
+				name: 'Cold',
 				data: []
 			},
 			{
-				name: 'Humidity warm',
+				name: 'Warm',
 				data: []
 			},
 			{
-				name: 'Humidity room',
+				name: 'Room',
 				data: []
 			}
 			]
@@ -541,21 +553,21 @@ function snd(s)
 
 			series: [
 				{
-					name: 'Temp cold',
+					name: 'Cold',
 					tooltip: {
 						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>°C</span><br />'
 					},
 					data: []
 				},
 				{
-					name: 'Temp warm',
+					name: 'Warm',
 					tooltip: {
 						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>°C</span><br />'
 					},
 					data: []
 				},
 				{
-					name: 'Temp room',
+					name: 'Room',
 					tooltip: {
 						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>°C</span><br />'
 					},
