@@ -13,6 +13,10 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 else
 	define('AJAX', false);
 
+define('SENS_COLD', 0);
+define('SENS_WARM', 1);
+define('SENS_ROOM', 2);
+
 
 class Sensor {
 	public $timestamp;
@@ -27,16 +31,22 @@ class Sensor {
 		$this->timestamp	= strtotime(array_shift($data));
 		$this->work 		= array_shift($data);
 
-		foreach($data as $k => $v)
-			if(0 == $k%2)
-				$this->data[] = (object)array('T' => (float)$data[$k], 'H' => (float)$data[$k+1]);
+		//foreach($data as $k => $v)
+		//	if(0 == $k%2)
+		for($i = 0; $i < 6; $i+=2)
+			$this->data[] = (object)array('T' => (float)$data[$i], 'H' => (float)$data[$i+1]);
 
+		$this->heater = (int)$data[6];
+		$this->humidifier = (int)$data[7];
+
+		/*
 		if(4 == count($this->data))
 		{
 			$tmp = array_pop($this->data);
 			$this->heater = $tmp->T;
 			$this->humidifier = $tmp->H;
 		}
+		*/
 	}
 
 }	// end of class
@@ -53,7 +63,7 @@ $log = 'logs/'.date('Ymd').'.log';
 
 $raw = file($log, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-$raw = array_slice($raw, -60, 60, true);
+$raw = array_slice($raw, -180, 180, true);
 
 
 $data = array();
@@ -64,25 +74,20 @@ foreach($raw as $row)
 $last = end($data);
 
 
-$ts = $h1 = $h2 = $t1 = $t2 = array();
+$ts = $h1 = $h2 = $ha = $hOn = $t1 = $t2 = $tOn = array();
 
 foreach($data as $d)
 {
 	$ts[] = date('H:i',$d->timestamp);
-	$h1[] = $d->data[0]->H;
-	$h2[] = $d->data[1]->H;
-	$t1[] = $d->data[0]->T;
-	$t2[] = $d->data[1]->T;
-	if(isset($d->data[2]))
-	{
-		$t3[] = $d->data[2]->T;
-		$h3[] = $d->data[2]->H;
-	}
-	else
-	{
-		$t3[] = 0;
-		$h3[] = 0;
-	}
+	$h1[] = $d->data[SENS_COLD]->H;
+	$h2[] = $d->data[SENS_WARM]->H;
+	$h3[] = $d->data[SENS_ROOM]->H;
+	$ha[] = round(($d->data[SENS_COLD]->H + $d->data[SENS_WARM]->H)/2, 1);
+	$t1[] = $d->data[SENS_COLD]->T;
+	$t2[] = $d->data[SENS_WARM]->T;
+	$t3[] = $d->data[SENS_ROOM]->T;
+	$tOn[] = $d->heater ? 30 : 20;
+	$hOn[] = $d->humidifier ? 80 : 70;
 }
 
 
@@ -90,18 +95,20 @@ if(AJAX)
 {
 	$data = [];
 
-	foreach(array('h1','h2','h3','t1','t2','t3') as $key)
+	foreach(array('h1','h2','h3','ha','hOn','t1','t2','t3','tOn') as $key)
 		$data[$key] = $$key;
 
 	$data['ts'] = $ts;
 	$data['last'] = array(
 			'ts' =>	date('H:i', $last->timestamp),
-			'tc' =>	$last->data[0]->T,
-			'th' =>	$last->data[1]->T,
-			'tr' =>	$last->data[2]->T,
-			'hc' =>	$last->data[0]->H,
-			'hh' =>	$last->data[1]->H,
-			'hr' =>	$last->data[2]->H,
+			'tc' =>	$last->data[SENS_COLD]->T,
+			'th' =>	$last->data[SENS_WARM]->T,
+			'tr' =>	$last->data[SENS_ROOM]->T,
+			'ta' =>	round(($last->data[SENS_COLD]->T + $last->data[SENS_WARM]->T)/2, 1),
+			'hc' =>	$last->data[SENS_COLD]->H,
+			'hh' =>	$last->data[SENS_WARM]->H,
+			'hr' =>	$last->data[SENS_ROOM]->H,
+			'ha' =>	round(($last->data[SENS_COLD]->H + $last->data[SENS_WARM]->H)/2, 1),
 		);
 
 	$data['next'] = round((($last->timestamp + $last->work + 60) - time())*1000);
@@ -165,8 +172,8 @@ $t3 = implode(',', $t3);
 
 
 	<!-- Bootstrap -->
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="./css/bootstrap.min.css">
+	<link rel="stylesheet" href="./css/bootstrap-theme.min.css">
 	<!--[if lt IE 9]>
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -174,8 +181,16 @@ $t3 = implode(',', $t3);
 	<style type="text/css">
 		body {background:black;}
 		h1, h2, a#navbar-brand {color:white;text-shadow: 1px 1px 0 red;font-weight:bold;}
-		a#navbar-brand {font-size:2em;}
+		a#navbar-brand {font-size:2em;padding:15px 10px 15px 15px;}
 		h1 button.btn {position:relative; top:-5px;}
+
+		#updBtn {padding:5px;font-weight:bold;}
+
+		#info span {white-space:nowrap;color:white;text-shadow: 1px 1px 0 red;font-weight:bold;padding-right:1em;position:relative;top:-10px;}
+		#info span.temp:before {text-shadow:none;font-weight:normal;content:"TAvg: ";}
+		#info span.heat:before {text-shadow:none;font-weight:normal;content:"Heater: ";}
+		#info span.hmdt:before {text-shadow:none;font-weight:normal;content:"HAvg: ";}
+		#info span.wet:before  {text-shadow:none;font-weight:normal;content:"Humidifier: ";}
 
 		.sep {height:1.5em;border-top:1px dotted #444;}
 
@@ -203,7 +218,7 @@ $t3 = implode(',', $t3);
 				<span class="icon-bar"></span>
 			</button>
 			<a id="navbar-brand" class="navbar-brand">TerraSens</a>
-			<button id="updBtn" class="btn btn-default navbar-btn navbar-left" onclick="reData();">
+			<button id="updBtn" class="btn btn-sm btn-default navbar-btn navbar-left" onclick="reData();">
 				<span id="ts"></span>
 				<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 			</button>
@@ -223,9 +238,8 @@ $t3 = implode(',', $t3);
 <div class="container-fluid">
 
 	<div class="row">
-		<div class="col-xs-12 sep"></div>
+		<div id="info" class="col-xs-12">&nbsp;</div>
 	</div>
-
 
 	<div class="row">
 		<div class="col-xs-12">
@@ -283,19 +297,20 @@ $t3 = implode(',', $t3);
 
 	<script src="./js/highcharts.js"></script>
 	<script src="./js/highcharts-more.js"></script>
-	<!--
-	<script src="./js/exporting.js"></script>
-	-->
+	<!-- <script src="./js/exporting.js"></script> -->
 	<script src="./js/howler.min.js"></script>
 
 
 <script>
-var chartH, chartT, chartNow, tOut, updBtn;
+var chartH, chartT, chartNow, tOut, updBtn, info;
+var SENS_COLD = 0, SENS_WARM = 1, SENS_ROOM = 2;
+
 
 function reData()
 {
-	//updBtn.hide();
-	$("#ts").text("");
+	updBtn.hide();
+	info.html("&nbsp;");
+	//$("#ts").text("");
 
 
 	var jqxhr = $.getJSON( "", function(data) {
@@ -312,6 +327,16 @@ function reData()
 
 
 		$("#ts").text(data.last.ts);
+		updBtn.show();
+		info.empty().append(
+				$("<span>").attr("class","temp").html(data.last.ta + "°C / " + ctof(data.last.ta) + "F"),
+				$("<span>").attr("class","heat").html((1 == data.heater ? 'On' : 'Off')),
+				$("<span>").attr("class","hmdt").html(data.last.ha + "%"),
+				$("<span>").attr("class", "wet").html((1 == data.humidifier ? 'On' : 'Off'))
+			);
+
+//		heater: 1
+//humidifier: 0
 
 		$("#tempH").css("width", th + '%').find("b").text(data.last.th + "°C / " + ctof(data.last.th) + "F");
 		$("#tempC").css("width", tc + '%').find("b").text(data.last.tc + "°C / " + ctof(data.last.tc) + "F");
@@ -368,9 +393,9 @@ function reData()
 			$("#hmdtC").addClass("progress-bar-success")
 
 		if(data.last.hr < data.settings.humidity.room_min)
-			$("#hmdtR").addClass("progress-bar-info")
-		else if(data.last.hr > data.settings.humidity.room_max)
 			$("#hmdtR").addClass("progress-bar-danger")
+		else if(data.last.hr > data.settings.humidity.room_max)
+			$("#hmdtR").addClass("progress-bar-info")
 		else
 			$("#hmdtR").addClass("progress-bar-success")
 
@@ -383,15 +408,18 @@ function reData()
 		*/
 
 		chartH.xAxis[0].update({categories: data.ts});
-		chartH.series[0].setData(data.h1);
-		chartH.series[1].setData(data.h2);
-		chartH.series[2].setData(data.h3);
+		chartH.series[SENS_COLD].setData(data.h1);
+		chartH.series[SENS_WARM].setData(data.h2);
+		chartH.series[SENS_ROOM].setData(data.h3);
+		chartH.series[3].setData(data.ha);
+		chartH.series[4].setData(data.hOn);
 		chartH.redraw();
 
 		chartT.xAxis[0].update({categories: data.ts});
-		chartT.series[0].setData(data.t1);
-		chartT.series[1].setData(data.t2);
-		chartT.series[2].setData(data.t3);
+		chartT.series[SENS_COLD].setData(data.t1);
+		chartT.series[SENS_WARM].setData(data.t2);
+		chartT.series[SENS_ROOM].setData(data.t3);
+		chartT.series[3].setData(data.tOn);
 		chartT.redraw();
 
 
@@ -399,7 +427,7 @@ function reData()
 
 		//console.log(Date.now())
 		//console.log( data );
-		updBtn.show();
+
 		clearTimeout(tOut);
 
 		var ts = 60000, now = new Date().getTime();
@@ -440,6 +468,7 @@ function snd(s)
 	$(function () {
 
 		updBtn = $("#updBtn");
+		info = $("#info");
 
 		//snd("sound");
 
@@ -459,7 +488,7 @@ function snd(s)
 //*
 
 		chartH = new Highcharts.Chart({
-			colors: ['blue', 'red', 'green'],
+			colors: ['blue', 'red', 'green', "brown", "gray"],
 			chart: {
 				renderTo: 'container1',
 				type: 'spline',
@@ -494,18 +523,37 @@ function snd(s)
 			},
 
 			series: [
-			{
-				name: 'Cold',
-				data: []
-			},
-			{
-				name: 'Warm',
-				data: []
-			},
-			{
-				name: 'Room',
-				data: []
-			}
+				{
+					name: 'Cold',
+					tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>%</span><br />'
+					},
+					data: []
+				},
+				{
+					name: 'Warm',
+					tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>%</span><br />'
+					},
+					data: []
+				},
+				{
+					name: 'Room',
+					tooltip: {
+						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>%</span><br />'
+					},
+					data: []
+				},
+				{
+					name: 'AVG',
+					tooltip: {},
+					data: []
+				},
+				{
+					name: 'Ctrl',
+					tooltip: {},
+					data: []
+				}
 			]
 		});
 
@@ -517,7 +565,7 @@ function snd(s)
 
 
 		chartT = new Highcharts.Chart({
-			colors: ['blue', 'red', 'green'],
+			colors: ['blue', 'red', 'green', "gray"],
 			chart: {
 				renderTo: "container2",
 				type: 'spline',
@@ -571,6 +619,11 @@ function snd(s)
 					tooltip: {
 						pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:.2f}</b>°C</span><br />'
 					},
+					data: []
+				},
+				{
+					name: 'Ctrl',
+					tooltip: {enabled: false},
 					data: []
 				}
 			]

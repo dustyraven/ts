@@ -46,11 +46,8 @@ pin_warm = int(Config.get('sensors', 'pin_warm'))
 pin_cold = int(Config.get('sensors', 'pin_cold'))
 pin_room = int(Config.get('sensors', 'pin_room'))
 
-warm_min = int(Config.get('temperature', 'warm_min'))
-warm_max = int(Config.get('temperature', 'warm_max'))
-
-h_avg_min = int(Config.get('humidity', 'avg_min'))
-h_avg_max = int(Config.get('humidity', 'avg_max'))
+target_temp = int(Config.get('temperature', 'target'))
+target_hmdt = int(Config.get('humidity', 'target'))
 
 pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
@@ -74,16 +71,17 @@ ts = ts_start.strftime("%Y%m%d%H%M%S")
 tempW = float(t_warm)
 h_avg = (float(h_cold) + float(h_warm)) / 2
 
+if tempW > 0:
+    if tempW > target_temp:
+        setCtrl(pin_heater, 0)
+    if tempW < target_temp:
+        setCtrl(pin_heater, 1)
 
-if tempW > warm_max:
-    setCtrl(pin_heater, 0)
-if tempW < warm_min:
-    setCtrl(pin_heater, 1)
-
-if h_avg > h_avg_max:
-    setCtrl(pin_humidifier, 0)
-if h_avg < h_avg_min:
-    setCtrl(pin_humidifier, 1)
+if h_avg > 0:
+    if h_avg > target_hmdt:
+        setCtrl(pin_humidifier, 0)
+    if h_avg < target_hmdt:
+        setCtrl(pin_humidifier, 1)
 
 print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, getCtrl(pin_heater), getCtrl(pin_humidifier)
 
