@@ -36,8 +36,6 @@ def getCtrl(pinNum):
 
 # SETUP
 
-bbt_apikey = '9e7f7faa92a43a1fb44696005e38000d'
-bbt_secret = '3f6957e1803c3555d01cfa5eb60116066953679e4dfff63b4a0988fcb66f3a67'
 
 ts_start = now()
 pwd = os.path.dirname(os.path.realpath(__file__))
@@ -56,6 +54,10 @@ target_hmdt = int(Config.get('humidity', 'target'))
 
 pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
+
+bbt_apikey = Config.get('beebotte', 'api_key')
+bbt_secret = Config.get('beebotte', 'secret')
+bbt_token  = Config.get('beebotte', 'token')
 
 # for Decimal
 #getcontext().prec = 2

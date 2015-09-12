@@ -37,6 +37,11 @@ if(AJAX)
 
 	$data['settings'] = $settings;
 
+	$allowedSettings = ['humidity', 'temperature'];
+	foreach($data['settings'] as $k => $v)
+		if(!in_array($k, $allowedSettings))
+			unset($data['settings'][$k]);
+
 	ob_start('ob_gzhandler');
 	header('Content-Type: application/json');
 	echo json_encode($data);
