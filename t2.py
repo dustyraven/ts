@@ -42,6 +42,26 @@ log = os.path.join(pwd,'logs','terrasens.log')
 Config = ConfigParser.ConfigParser()
 Config.read(ini)
 
+
+class IniIntParser(ConfigParser.ConfigParser):
+    def extract_ints(self):
+        d = dict(self._sections)
+        t = {}
+        for k in d:
+            d[k] = dict(self._defaults, **d[k])
+            d[k].pop('__name__', None)
+            for kk in d[k]:
+                if d[k][kk].isdigit():
+                    globals()['_' + k + '_' + kk] = int(d[k][kk])
+
+f = IniIntParser()
+f.read(ini)
+f.extract_ints()
+print locals()
+#print d['sensors']['pin_warm']
+sys.exit(0)
+
+
 pin_warm = int(Config.get('sensors', 'pin_warm'))
 pin_cold = int(Config.get('sensors', 'pin_cold'))
 pin_room = int(Config.get('sensors', 'pin_room'))

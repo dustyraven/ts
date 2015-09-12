@@ -94,6 +94,7 @@ header('Content-Type: text/html; charset=UTF-8', true);
 		<div class="collapse navbar-collapse" id="navbarcollapse">
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="charts.php">Charts</a></li>
+				<li><a href="https://beebotte.com/dash/54e55cf0-5933-11e5-b705-cb32fe72af39" target="_blank">BeeBotte</a></li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->
