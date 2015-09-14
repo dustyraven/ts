@@ -34,6 +34,7 @@ if(AJAX)
 
 	$data['heater'] = $last->heater;
 	$data['humidifier'] = $last->humidifier;
+	$data['lamp'] = $last->lamp;
 
 	$data['settings'] = $settings;
 
@@ -127,9 +128,11 @@ function reData()
 		info.empty().append(
 				$("<span>").attr("class","temp").html(data.last.ta + "°C / " + ctof(data.last.ta) + "F"),
 				" ",
+				$("<span>").attr("class","hmdt").html(data.last.ha + "%"),
+				" ",
 				$("<span>").attr("class","heat").html((1 == data.heater ? 'On' : 'Off')),
 				" ",
-				$("<span>").attr("class","hmdt").html(data.last.ha + "%"),
+				$("<span>").attr("class","lamp").html((1 == data.lamp ? 'On' : 'Off')),
 				" ",
 				$("<span>").attr("class", "wet").html((1 == data.humidifier ? 'On' : 'Off'))
 			);
@@ -200,7 +203,7 @@ function reData()
 
 
 
-		snd("click");
+		//snd("click");
 
 		clearTimeout(tOut);
 

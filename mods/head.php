@@ -54,6 +54,7 @@ header('Content-Type: text/html; charset=UTF-8', true);
 		#info span {white-space:nowrap;padding-right:.5em;position:relative;top:-10px;}
 		#info span.temp:before {text-shadow:none;font-weight:normal;content:"TAvg: ";}
 		#info span.heat:before {text-shadow:none;font-weight:normal;content:"Heater: ";}
+		#info span.lamp:before {text-shadow:none;font-weight:normal;content:"Lamp: ";}
 		#info span.hmdt:before {text-shadow:none;font-weight:normal;content:"HAvg: ";}
 		#info span.wet:before  {text-shadow:none;font-weight:normal;content:"Humidifier: ";}
 
