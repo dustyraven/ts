@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os, sys, datetime
+import os, sys, datetime, warnings
 import Adafruit_DHT
 import RPi.GPIO as GPIO
 import ConfigParser
@@ -30,12 +30,23 @@ def setCtrl(pinNum, state):
         pass
 
 def getCtrl(pinNum):
-    return int(GPIO.gpio_function(pinNum) == GPIO.OUT)
+    r = GPIO.input(pinNum)
+    return int(r)
+    #return int(GPIO.gpio_function(pinNum) == GPIO.OUT)
 
+def setOut(pinNum):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        GPIO.setup(pinNum, GPIO.OUT)
+
+def setIn(pinNum):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        GPIO.setup(pinNum, GPIO.IN)
 
 def chkInit(pinNum):
     if GPIO.gpio_function(pinNum) == GPIO.IN:
-        GPIO.setup(pinNum, GPIO.OUT)
+        setOut(pinNum)
         GPIO.output(pinNum, False)
 
 
@@ -78,6 +89,13 @@ GPIO.setwarnings(False)
 for pin in [2,3,4,17,27,22,10,9,11]:
     chkInit(pin)
 
+for pin in [pin_warm, pin_cold, pin_room]:
+    setIn(pin)
+
+for pin in [pin_heater, pin_humidifier, pin_lamp]:
+    setOut(pin)
+
+
 #sys.exit(0)
 
 t_warm, h_warm = getsens(pin_warm)
@@ -108,14 +126,22 @@ if h_avg > 0:
         setCtrl(pin_humidifier, 1)
 """
 
+
+"""
+try:
+    c_heater = getCtrl(pin_heater)
+    c_humidifier = getCtrl(pin_humidifier)
+    c_lamp = getCtrl(pin_lamp)
+except:
+    c_heater = 0
+    c_humidifier = 0
+    c_lamp = 0
+"""
+
 c_heater = getCtrl(pin_heater)
 c_humidifier = getCtrl(pin_humidifier)
 c_lamp = getCtrl(pin_lamp)
 
-
-c_heater = 0
-c_humidifier = 0
-c_lamp = 0
 
 print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp
 
