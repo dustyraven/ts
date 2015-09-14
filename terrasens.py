@@ -87,9 +87,6 @@ t_room, h_room = getsens(pin_room)
 h_avg = round((float(h_cold) + float(h_warm)) / 2, 1)
 t_avg = round((float(t_cold) + float(t_warm)) / 2, 1)
 
-#bbt.publish('TerraSens', 't_avg', 'Hello World')
-#bclient.write('dev', 'res1', 'Hello World')
-
 ts_end = now()
 ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 
@@ -122,24 +119,28 @@ c_lamp = 0
 
 print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp
 
+try:
 
-bbt = BBT(bbt_apikey, bbt_secret)
+    bbt = BBT(bbt_apikey, bbt_secret)
 
-bbt.writeBulk('TerraSens', [
-    {   'resource': 'h_warm',   'data': round(float(h_warm),1) },
-    {   'resource': 'h_cold',   'data': round(float(h_cold),1) },
-    {   'resource': 'h_room',   'data': round(float(h_room),1) },
-    {   'resource': 'h_avg',    'data': h_avg },
+    bbt.writeBulk('TerraSens', [
+        {   'resource': 'h_warm',   'data': round(float(h_warm),1) },
+        {   'resource': 'h_cold',   'data': round(float(h_cold),1) },
+        {   'resource': 'h_room',   'data': round(float(h_room),1) },
+        {   'resource': 'h_avg',    'data': h_avg },
 
-    {   'resource': 't_warm',   'data': round(float(t_warm),1) },
-    {   'resource': 't_cold',   'data': round(float(t_cold),1) },
-    {   'resource': 't_room',   'data': round(float(t_room),1) },
-    {   'resource': 't_avg',    'data': t_avg },
+        {   'resource': 't_warm',   'data': round(float(t_warm),1) },
+        {   'resource': 't_cold',   'data': round(float(t_cold),1) },
+        {   'resource': 't_room',   'data': round(float(t_room),1) },
+        {   'resource': 't_avg',    'data': t_avg },
 
-    {   'resource': 'c_heater',     'data': c_heater },
-    {   'resource': 'c_humidifier', 'data': c_humidifier }
-])
+        {   'resource': 'c_heater',     'data': c_heater },
+        {   'resource': 'c_humidifier', 'data': c_humidifier },
+        {   'resource': 'c_lamp',       'data': c_lamp }
+    ])
 
+except:
+    pass
 
 
 sys.exit(0)
