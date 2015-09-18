@@ -22,12 +22,15 @@ def getsens( pin ):
 
 
 def setCtrl(pinNum, state):
+    GPIO.output(pinNum, state)
+    """
     if 0 == state:
         GPIO.setup(pinNum, GPIO.IN)
     elif 1 == state:
         GPIO.setup(pinNum, GPIO.OUT)
     else:
         pass
+    """
 
 def getCtrl(pinNum):
     r = GPIO.input(pinNum)
@@ -72,6 +75,11 @@ target_hmdt = int(Config.get('humidity', 'target'))
 pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
 pin_lamp = int(Config.get('control', 'pin_lamp'))
+pin_ctrl_4 = int(Config.get('control', 'pin_ctrl_4'))
+pin_ctrl_5 = int(Config.get('control', 'pin_ctrl_5'))
+pin_ctrl_6 = int(Config.get('control', 'pin_ctrl_6'))
+pin_ctrl_7 = int(Config.get('control', 'pin_ctrl_7'))
+pin_ctrl_8 = int(Config.get('control', 'pin_ctrl_8'))
 
 bbt_apikey = Config.get('beebotte', 'api_key')
 bbt_secret = Config.get('beebotte', 'secret')
@@ -86,7 +94,7 @@ bbt_token  = Config.get('beebotte', 'token')
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-for pin in [2,3,4,17,27,22,10,9,11]:
+for pin in [pin_heater,pin_humidifier,pin_lamp,pin_ctrl_4,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_ctrl_8]:
     chkInit(pin)
 
 for pin in [pin_warm, pin_cold, pin_room]:
@@ -110,41 +118,37 @@ ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
-"""
 tempW = float(t_warm)
 
+# HEATER
 if tempW > 0:
     if tempW > target_temp:
         setCtrl(pin_heater, 0)
     if tempW < target_temp:
         setCtrl(pin_heater, 1)
 
+# HUMIDIFIER
 if h_avg > 0:
     if h_avg > target_hmdt:
         setCtrl(pin_humidifier, 0)
     if h_avg < target_hmdt:
         setCtrl(pin_humidifier, 1)
-"""
 
+# LAMP
+if 0 == now().minute % 3:
+    setCtrl(pin_lamp, 1)
+else:
+    setCtrl(pin_lamp, 0)
 
-"""
-try:
-    c_heater = getCtrl(pin_heater)
-    c_humidifier = getCtrl(pin_humidifier)
-    c_lamp = getCtrl(pin_lamp)
-except:
-    c_heater = 0
-    c_humidifier = 0
-    c_lamp = 0
-"""
-
+# GET CONTROLS STATUSES
 c_heater = getCtrl(pin_heater)
 c_humidifier = getCtrl(pin_humidifier)
 c_lamp = getCtrl(pin_lamp)
 
-
+# OUTPUT
 print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp
 
+# SEND DATA
 try:
 
     bbt = BBT(bbt_apikey, bbt_secret)
