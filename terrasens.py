@@ -33,8 +33,7 @@ def setCtrl(pinNum, state):
     """
 
 def getCtrl(pinNum):
-    r = GPIO.input(pinNum)
-    return int(r)
+    return int(GPIO.input(pinNum))
     #return int(GPIO.gpio_function(pinNum) == GPIO.OUT)
 
 def setOut(pinNum):
@@ -71,6 +70,7 @@ pin_room = int(Config.get('sensors', 'pin_room'))
 
 target_temp = int(Config.get('temperature', 'target'))
 target_hmdt = int(Config.get('humidity', 'target'))
+lamp_freq = int(Config.get('temperature', 'lamp_freq'))
 
 pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
@@ -135,7 +135,7 @@ if h_avg > 0:
         setCtrl(pin_humidifier, 1)
 
 # LAMP
-if 0 == now().minute % 3:
+if 0 == now().minute % lamp_freq:
     setCtrl(pin_lamp, 1)
 else:
     setCtrl(pin_lamp, 0)
