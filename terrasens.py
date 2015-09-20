@@ -83,7 +83,7 @@ lamp_freq = int(Config.get('temperature', 'lamp_freq'))
 pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
 pin_lamp = int(Config.get('control', 'pin_lamp'))
-pin_ctrl_4 = int(Config.get('control', 'pin_ctrl_4'))
+pin_warn = int(Config.get('control', 'pin_warn'))
 pin_ctrl_5 = int(Config.get('control', 'pin_ctrl_5'))
 pin_ctrl_6 = int(Config.get('control', 'pin_ctrl_6'))
 pin_ctrl_7 = int(Config.get('control', 'pin_ctrl_7'))
@@ -93,7 +93,7 @@ bbt_apikey = Config.get('beebotte', 'api_key')
 bbt_secret = Config.get('beebotte', 'secret')
 bbt_token  = Config.get('beebotte', 'token')
 
-buzz_time = 0.2
+buzz_time = 0
 
 # for Decimal
 #getcontext().prec = 2
@@ -104,13 +104,13 @@ buzz_time = 0.2
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-for pin in [pin_heater,pin_humidifier,pin_lamp,pin_ctrl_4,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
+for pin in [pin_heater,pin_humidifier,pin_lamp,pin_warn,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
     chkInit(pin)
 
 for pin in [pin_warm, pin_cold, pin_room]:
     setIn(pin)
 
-for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz]:
+for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz, pin_warn]:
     setOut(pin)
 
 
@@ -198,7 +198,11 @@ except:
     buzz_time += 1
 
 
-buzz(buzz_time)
+if(buzz_time > 0):
+    buzz(buzz_time)
+    setCtrl(pin_warn, 1)
+else:
+    setCtrl(pin_warn, 0)
 
 sys.exit(0)
 
