@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os, sys, datetime, warnings
+import os, sys, time, datetime, warnings
 import Adafruit_DHT
 import RPi.GPIO as GPIO
 import ConfigParser
@@ -52,6 +52,13 @@ def chkInit(pinNum):
         GPIO.output(pinNum, False)
 
 
+def buzz(sec):
+    if 0 == sec:
+        return 0
+    setCtrl(pin_buzz, 1)
+    time.sleep(sec)
+    setCtrl(pin_buzz, 0)
+
 
 # SETUP
 
@@ -68,6 +75,7 @@ pin_warm = int(Config.get('sensors', 'pin_warm'))
 pin_cold = int(Config.get('sensors', 'pin_cold'))
 pin_room = int(Config.get('sensors', 'pin_room'))
 
+cold_min_temp = int(Config.get('temperature', 'cold_min'))
 target_temp = int(Config.get('temperature', 'target'))
 target_hmdt = int(Config.get('humidity', 'target'))
 lamp_freq = int(Config.get('temperature', 'lamp_freq'))
@@ -79,11 +87,13 @@ pin_ctrl_4 = int(Config.get('control', 'pin_ctrl_4'))
 pin_ctrl_5 = int(Config.get('control', 'pin_ctrl_5'))
 pin_ctrl_6 = int(Config.get('control', 'pin_ctrl_6'))
 pin_ctrl_7 = int(Config.get('control', 'pin_ctrl_7'))
-pin_ctrl_8 = int(Config.get('control', 'pin_ctrl_8'))
+pin_buzz = int(Config.get('control', 'pin_buzz'))
 
 bbt_apikey = Config.get('beebotte', 'api_key')
 bbt_secret = Config.get('beebotte', 'secret')
 bbt_token  = Config.get('beebotte', 'token')
+
+buzz_time = 0.2
 
 # for Decimal
 #getcontext().prec = 2
@@ -94,13 +104,13 @@ bbt_token  = Config.get('beebotte', 'token')
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-for pin in [pin_heater,pin_humidifier,pin_lamp,pin_ctrl_4,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_ctrl_8]:
+for pin in [pin_heater,pin_humidifier,pin_lamp,pin_ctrl_4,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
     chkInit(pin)
 
 for pin in [pin_warm, pin_cold, pin_room]:
     setIn(pin)
 
-for pin in [pin_heater, pin_humidifier, pin_lamp]:
+for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz]:
     setOut(pin)
 
 
@@ -110,32 +120,47 @@ t_warm, h_warm = getsens(pin_warm)
 t_cold, h_cold = getsens(pin_cold)
 t_room, h_room = getsens(pin_room)
 
-h_avg = round((float(h_cold) + float(h_warm)) / 2, 1)
-t_avg = round((float(t_cold) + float(t_warm)) / 2, 1)
+tempW = float(t_warm)
+tempC = float(t_cold)
+hmdtW = float(h_warm)
+hmdtC = float(h_cold)
+
+
+if hmdtC > 0 and hmdtW > 0:
+    h_avg = round((hmdtC + hmdtW) / 2, 1)
+else:
+    h_avg = -1
+    buzz_time += 1
+
+if tempC > 0 and tempW > 0:
+    t_avg = round((tempC + tempW) / 2, 1)
+else:
+    t_avg = -1
+    buzz_time += 1
+
+#h_avg = round((hmdtC + hmdtW) / 2, 1) if hmdtC > 0 and hmdtW > 0 else -1
+#t_avg = round((tempC + tempW) / 2, 1) if tempC > 0 and tempW > 0 else -1
 
 ts_end = now()
 ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
-tempW = float(t_warm)
 
 # HEATER
-if tempW > 0:
-    if tempW > target_temp:
-        setCtrl(pin_heater, 0)
-    if tempW < target_temp:
-        setCtrl(pin_heater, 1)
+if tempW > 0 and tempW < target_temp:
+    setCtrl(pin_heater, 1)
+else:
+    setCtrl(pin_heater, 0)
 
 # HUMIDIFIER
-if h_avg > 0:
-    if h_avg > target_hmdt:
-        setCtrl(pin_humidifier, 0)
-    if h_avg < target_hmdt:
-        setCtrl(pin_humidifier, 1)
+if h_avg > 0 and h_avg < target_hmdt:
+    setCtrl(pin_humidifier, 1)
+else:
+    setCtrl(pin_humidifier, 0)
 
 # LAMP
-if 0 == now().minute % lamp_freq:
+if t_avg > 0 and tempC < cold_min_temp and 0 == now().minute % lamp_freq:
     setCtrl(pin_lamp, 1)
 else:
     setCtrl(pin_lamp, 0)
@@ -170,8 +195,10 @@ try:
     ])
 
 except:
-    pass
+    buzz_time += 1
 
+
+buzz(buzz_time)
 
 sys.exit(0)
 
