@@ -57,7 +57,7 @@ header('Content-Type: text/html; charset=UTF-8', true);
 		#info span.lamp:before {text-shadow:none;font-weight:normal;content:"Lamp: ";}
 		#info span.hmdt:before {text-shadow:none;font-weight:normal;content:"hAvg: ";}
 		#info span.wet:before  {text-shadow:none;font-weight:normal;content:"Humidifier: ";}
-		#info span.next:before  {text-shadow:none;font-weight:normal;content:"Next: ";}
+		#info span.next:before {text-shadow:none;font-weight:normal;content:"Next: ";}
 
 		.sep {height:1.5em;border-top:1px dotted #444;}
 

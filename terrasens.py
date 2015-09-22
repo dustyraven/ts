@@ -15,7 +15,6 @@ def getsens( pin ):
 
     #def read_retry(sensor, pin, retries=15, delay_seconds=2, platform=None)
     hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 10, 1, platform)
-    #hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 10, 2)
 
     t = '{0:0.2f}'.format(temp) if temp is not None else -1
     h = '{0:0.2f}'.format(hmdt) if hmdt is not None else -1
