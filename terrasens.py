@@ -13,7 +13,9 @@ def now():
 
 def getsens( pin ):
 
-    hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin)
+    #def read_retry(sensor, pin, retries=15, delay_seconds=2, platform=None)
+    hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 10, 1, platform)
+    #hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 10, 2)
 
     t = '{0:0.2f}'.format(temp) if temp is not None else -1
     h = '{0:0.2f}'.format(hmdt) if hmdt is not None else -1
@@ -70,6 +72,8 @@ log = os.path.join(pwd,'logs','terrasens.log')
 
 Config = ConfigParser.ConfigParser()
 Config.read(ini)
+
+platform = Adafruit_DHT.common.get_platform() #Adafruit_DHT.platform_detect.platform_detect()
 
 pin_warm = int(Config.get('sensors', 'pin_warm'))
 pin_cold = int(Config.get('sensors', 'pin_cold'))
@@ -160,7 +164,7 @@ else:
     setCtrl(pin_humidifier, 0)
 
 # LAMP
-if t_avg > 0 and tempC < cold_min_temp and 0 == now().minute % lamp_freq:
+if t_avg > 0 and tempC <= cold_min_temp and 0 == now().minute % lamp_freq:
     setCtrl(pin_lamp, 1)
 else:
     setCtrl(pin_lamp, 0)

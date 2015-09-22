@@ -134,7 +134,9 @@ function reData()
 				" ",
 				$("<span>").attr("class","lamp").html((1 == data.lamp ? 'On' : 'Off')),
 				" ",
-				$("<span>").attr("class", "wet").html((1 == data.humidifier ? 'On' : 'Off'))
+				$("<span>").attr("class", "wet").html((1 == data.humidifier ? 'On' : 'Off')),
+				" ",
+				$("<span>").attr("class", "next").html("")
 			);
 
 //		heater: 1
@@ -214,6 +216,7 @@ function reData()
 		else
 			console.log(data.next)
 
+		$("span.next").html(Math.round(ts/1000))
 		tOut = setTimeout(reData, ts);
 		//console.log(tOut);
 	});
@@ -242,11 +245,23 @@ function snd(s)
 	new Howl({urls: ["snd/"+s+".ogg", "snd/"+s+".mp3"]}).play();
 }
 
+function tNext()
+{
+	var c, n = $("span.next");
+	if(n)
+	{
+		c = parseInt(n.text()) - 1;
+		n.html(c > 0 ? c : '-');
+	}
+	setTimeout(tNext, 1000);
+}
+
 $(function () {
 
 	updBtn = $("#updBtn");
 	info = $("#info");
 	reData();
+	tNext();
 });
 
 
