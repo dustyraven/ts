@@ -130,13 +130,13 @@ function reData()
 				" ",
 				$("<span>").attr("class","hmdt").html(data.last.ha + "%"),
 				" ",
-				$("<span>").attr("class","heat").html((1 == data.heater ? 'On' : 'Off')),
+				$("<span>").attr("class", "heat " + (1 == data.heater ? 'on' : 'off')),
 				" ",
-				$("<span>").attr("class","lamp").html((1 == data.lamp ? 'On' : 'Off')),
+				$("<span>").attr("class","lamp " + (1 == data.lamp ? 'on' : 'off')),
 				" ",
-				$("<span>").attr("class", "wet").html((1 == data.humidifier ? 'On' : 'Off')),
+				$("<span>").attr("class", "wet " + (1 == data.humidifier ? 'on' : 'off')),
 				" ",
-				$("<span>").attr("class", "next").html("")
+				$("<span>").attr("class", "next")
 			);
 
 //		heater: 1
