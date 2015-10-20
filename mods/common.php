@@ -17,6 +17,8 @@ define('SENS_COLD', 0);
 define('SENS_WARM', 1);
 define('SENS_ROOM', 2);
 
+$allowedSettings = ['humidity', 'temperature'];
+
 
 class Sensor {
 	public $timestamp;

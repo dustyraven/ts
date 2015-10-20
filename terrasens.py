@@ -198,7 +198,8 @@ try:
     ])
 
 except:
-    buzz_time += 1
+    pass
+    #buzz_time += 1
 
 
 if(buzz_time > 0):
