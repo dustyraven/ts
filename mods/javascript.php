@@ -25,7 +25,7 @@ function reData()
 		$("#ts").text(data.last.ts);
 		updBtn.show();
 		info.empty().append(
-				$("<span>").attr("class","temp").html(data.last.ta + "°C / " + ctof(data.last.ta) + "F"),
+				$("<span>").attr("class","temp").html(data.last.ta + "° / " + ctof(data.last.ta) + "F"),
 				" ",
 				$("<span>").attr("class","hmdt").html(data.last.ha + "%"),
 				" ",
@@ -38,9 +38,9 @@ function reData()
 				$("<span>").attr("class","next")
 			);
 
-		$("#tempH").css("width", th + '%').find("b").text(data.last.th + "°C / " + ctof(data.last.th) + "F");
-		$("#tempC").css("width", tc + '%').find("b").text(data.last.tc + "°C / " + ctof(data.last.tc) + "F");
-		$("#tempR").css("width", tr + '%').find("b").text(data.last.tr + "°C / " + ctof(data.last.tr) + "F");
+		$("#tempH").css("width", th + '%').find("b").text(data.last.th + "° / " + ctof(data.last.th) + "F");
+		$("#tempC").css("width", tc + '%').find("b").text(data.last.tc + "° / " + ctof(data.last.tc) + "F");
+		$("#tempR").css("width", tr + '%').find("b").text(data.last.tr + "° / " + ctof(data.last.tr) + "F");
 		$("#hmdtH").css("width", hh + '%').find("b").text(data.last.hh);
 		$("#hmdtC").css("width", hc + '%').find("b").text(data.last.hc);
 		$("#hmdtR").css("width", hr + '%').find("b").text(data.last.hr);
