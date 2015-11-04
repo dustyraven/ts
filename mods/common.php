@@ -27,6 +27,7 @@ class Sensor {
 	public $heater = 0;
 	public $humidifier = 0;
 	public $lamp = 0;
+	public $htop = 0;
 
 	public function __construct($row)
 	{
@@ -42,6 +43,7 @@ class Sensor {
 		$this->heater = (int)$data[6];
 		$this->humidifier = (int)$data[7];
 		$this->lamp = isset($data[8]) ? (int)$data[8] : 0;
+		$this->htop = isset($data[9]) ? (int)$data[9] : 0;
 
 		/*
 		if(4 == count($this->data))

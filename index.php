@@ -47,6 +47,7 @@ if(AJAX)
 	$data['heater'] = $last->heater;
 	$data['humidifier'] = $last->humidifier;
 	$data['lamp'] = $last->lamp;
+	$data['htop'] = $last->htop;
 
 	$data['settings'] = $settings;
 

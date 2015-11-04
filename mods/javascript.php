@@ -33,6 +33,8 @@ function reData()
 				" ",
 				$("<span>").attr("class","lamp " + (1 == data.lamp ? 'on' : 'off')),
 				" ",
+				$("<span>").attr("class","htop " + (1 == data.htop ? 'on' : 'off')),
+				" ",
 				$("<span>").attr("class","mist " + (1 == data.humidifier ? 'on' : 'off')),
 				" ",
 				$("<span>").attr("class","next")

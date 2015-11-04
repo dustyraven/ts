@@ -79,6 +79,8 @@ pin_cold = int(Config.get('sensors', 'pin_cold'))
 pin_room = int(Config.get('sensors', 'pin_room'))
 
 cold_min_temp = int(Config.get('temperature', 'cold_min'))
+cold_max_temp = int(Config.get('temperature', 'cold_max'))
+warm_max_temp = int(Config.get('temperature', 'warm_max'))
 target_temp = int(Config.get('temperature', 'target'))
 target_hmdt = int(Config.get('humidity', 'target'))
 lamp_freq = int(Config.get('temperature', 'lamp_freq'))
@@ -87,7 +89,7 @@ pin_heater = int(Config.get('control', 'pin_heater'))
 pin_humidifier = int(Config.get('control', 'pin_humidifier'))
 pin_lamp = int(Config.get('control', 'pin_lamp'))
 pin_warn = int(Config.get('control', 'pin_warn'))
-pin_ctrl_5 = int(Config.get('control', 'pin_ctrl_5'))
+pin_htop = int(Config.get('control', 'pin_htop'))
 pin_ctrl_6 = int(Config.get('control', 'pin_ctrl_6'))
 pin_ctrl_7 = int(Config.get('control', 'pin_ctrl_7'))
 pin_buzz = int(Config.get('control', 'pin_buzz'))
@@ -107,13 +109,13 @@ buzz_time = 0
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-for pin in [pin_heater,pin_humidifier,pin_lamp,pin_warn,pin_ctrl_5,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
+for pin in [pin_heater,pin_humidifier,pin_lamp,pin_warn,pin_htop,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
     chkInit(pin)
 
 for pin in [pin_warm, pin_cold, pin_room]:
     setIn(pin)
 
-for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz, pin_warn]:
+for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz, pin_warn, pin_htop]:
     setOut(pin)
 
 
@@ -150,6 +152,7 @@ ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
 
+
 # HEATER
 if tempW > 0 and tempW < target_temp:
     setCtrl(pin_heater, 1)
@@ -162,8 +165,14 @@ if h_avg > 0 and h_avg < target_hmdt:
 else:
     setCtrl(pin_humidifier, 0)
 
+# HEATER TOP
+if t_avg > 0 and tempC < cold_min_temp and tempW < warm_max_temp:
+    setCtrl(pin_htop, 1)
+else:
+    setCtrl(pin_htop, 0)
+
 # LAMP
-if t_avg > 0 and tempC <= cold_min_temp and 0 == now().minute % lamp_freq:
+if t_avg > 0 and tempC < cold_min_temp and 0 == now().minute % lamp_freq:
     setCtrl(pin_lamp, 1)
 else:
     setCtrl(pin_lamp, 0)
@@ -172,9 +181,10 @@ else:
 c_heater = getCtrl(pin_heater)
 c_humidifier = getCtrl(pin_humidifier)
 c_lamp = getCtrl(pin_lamp)
+c_htop = getCtrl(pin_htop)
 
 # OUTPUT
-print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp
+print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp, c_htop
 
 # SEND DATA
 try:

@@ -58,6 +58,7 @@ header('Content-Type: text/html; charset=UTF-8', true);
 		#info span.hmdt:before {content:"hAvg: ";}
 		#info span.heat:before {content:"heat";}
 		#info span.lamp:before {content:"lamp";}
+		#info span.htop:before {content:"hTop";}
 		#info span.mist:before  {content:"mist";}
 		#info span.next:before {content:"";}
 
