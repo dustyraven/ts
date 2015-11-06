@@ -80,6 +80,7 @@ pin_room = int(Config.get('sensors', 'pin_room'))
 
 cold_min_temp = int(Config.get('temperature', 'cold_min'))
 cold_max_temp = int(Config.get('temperature', 'cold_max'))
+warm_min_temp = int(Config.get('temperature', 'warm_min'))
 warm_max_temp = int(Config.get('temperature', 'warm_max'))
 target_temp = int(Config.get('temperature', 'target'))
 target_hmdt = int(Config.get('humidity', 'target'))
@@ -166,13 +167,13 @@ else:
     setCtrl(pin_humidifier, 0)
 
 # HEATER TOP
-if t_avg > 0 and tempC < cold_min_temp and tempW < warm_max_temp:
+if t_avg > 0 and tempC < cold_min_temp and tempW < target_temp:
     setCtrl(pin_htop, 1)
 else:
     setCtrl(pin_htop, 0)
 
 # LAMP
-if t_avg > 0 and tempC < cold_min_temp and 0 == now().minute % lamp_freq:
+if t_avg > 0 and tempC <= cold_min_temp and tempW <= warm_min_temp and 0 == now().minute % lamp_freq:
     setCtrl(pin_lamp, 1)
 else:
     setCtrl(pin_lamp, 0)

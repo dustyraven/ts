@@ -14,11 +14,11 @@ function reData()
 		if(data.reload)
 			location.reload(true);
 
-		var tc = percRange(data.last.tc, 10, 40);
-			th = percRange(data.last.th, 10, 40);
-			tr = percRange(data.last.tr, 10, 40);
-			hc = percRange(data.last.hc, 20, 90);
-			hh = percRange(data.last.hh, 20, 90);
+		var tc = percRange(data.last.tc, 15, 40);
+			th = percRange(data.last.th, 15, 40);
+			tr = percRange(data.last.tr, 15, 40);
+			hc = percRange(data.last.hc, 20, 100);
+			hh = percRange(data.last.hh, 20, 100);
 			hr = percRange(data.last.hr, 20, 60);
 
 
