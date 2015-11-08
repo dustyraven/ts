@@ -72,6 +72,8 @@ header('Content-Type: text/html; charset=UTF-8', true);
 		.progress-bar-danger {background-color:red;}
 
 		 .highcharts-tooltip {font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
+
+		 #ll {color:green; font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
 	</style>
 </head>
 <body>

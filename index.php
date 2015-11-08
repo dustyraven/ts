@@ -22,10 +22,11 @@ if(AJAX)
 
 	$raw = array_slice($raw, -10, 10, true);
 
+	$ll = end($raw);
 
 	$logs = array();
 	foreach($raw as $row)
-		if(preg_match('/^20[\d\s\.]+$/', $row))
+		if(preg_match('/^20[\d\s\.-]+$/', $row))
 			$logs[] = new Sensor($row);
 
 	$last = end($logs);
@@ -41,6 +42,7 @@ if(AJAX)
 			'hh' =>	$last->data[SENS_WARM]->H,
 			'hr' =>	$last->data[SENS_ROOM]->H,
 			'ha' =>	round(($last->data[SENS_COLD]->H + $last->data[SENS_WARM]->H)/2, 1),
+			'll' => $ll,
 		);
 
 
@@ -105,6 +107,14 @@ include 'mods/head.php';
 				<div id="hmdtR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b>%</div>
 			</div>
 		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 sep"></div>
+	</div>
+
+	<div class="row">
+		<div id="ll" class="col-xs-12"></div>
 	</div>
 
 </div>

@@ -7,7 +7,7 @@ var SENS_COLD = 0, SENS_WARM = 1, SENS_ROOM = 2;
 function reData()
 {
 	updBtn.hide();
-	info.html("&nbsp;");
+	//info.html("&nbsp;");
 
 	var jqxhr = $.getJSON( "", function(data) {
 
@@ -23,6 +23,7 @@ function reData()
 
 
 		$("#ts").text(data.last.ts);
+		$("#ll").text(data.last.ll);
 		updBtn.show();
 		info.empty().append(
 				$("<span>").attr("class","temp").html(data.last.ta + "° / " + ctof(data.last.ta) + "F"),

@@ -14,7 +14,7 @@ def now():
 def getsens( pin ):
 
     #def read_retry(sensor, pin, retries=15, delay_seconds=2, platform=None)
-    hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 10, 1, platform)
+    hmdt, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, pin, 5, 1, platform)
 
     t = '{0:0.2f}'.format(temp) if temp is not None else -1
     h = '{0:0.2f}'.format(hmdt) if hmdt is not None else -1
@@ -86,8 +86,8 @@ target_temp = int(Config.get('temperature', 'target'))
 target_hmdt = int(Config.get('humidity', 'target'))
 lamp_freq = int(Config.get('temperature', 'lamp_freq'))
 
-pin_heater = int(Config.get('control', 'pin_heater'))
-pin_humidifier = int(Config.get('control', 'pin_humidifier'))
+pin_heat = int(Config.get('control', 'pin_heat'))
+pin_mist = int(Config.get('control', 'pin_mist'))
 pin_lamp = int(Config.get('control', 'pin_lamp'))
 pin_warn = int(Config.get('control', 'pin_warn'))
 pin_htop = int(Config.get('control', 'pin_htop'))
@@ -110,13 +110,13 @@ buzz_time = 0
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-for pin in [pin_heater,pin_humidifier,pin_lamp,pin_warn,pin_htop,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
+for pin in [pin_heat,pin_mist,pin_lamp,pin_warn,pin_htop,pin_ctrl_6,pin_ctrl_7,pin_buzz]:
     chkInit(pin)
 
 for pin in [pin_warm, pin_cold, pin_room]:
     setIn(pin)
 
-for pin in [pin_heater, pin_humidifier, pin_lamp, pin_buzz, pin_warn, pin_htop]:
+for pin in [pin_heat, pin_mist, pin_lamp, pin_warn, pin_htop, pin_buzz]:
     setOut(pin)
 
 
@@ -156,15 +156,15 @@ ts = ts_start.strftime("%Y%m%d%H%M%S")
 
 # HEATER
 if tempW > 0 and tempW < target_temp:
-    setCtrl(pin_heater, 1)
+    setCtrl(pin_heat, 1)
 else:
-    setCtrl(pin_heater, 0)
+    setCtrl(pin_heat, 0)
 
 # HUMIDIFIER
 if h_avg > 0 and h_avg < target_hmdt:
-    setCtrl(pin_humidifier, 1)
+    setCtrl(pin_mist, 1)
 else:
-    setCtrl(pin_humidifier, 0)
+    setCtrl(pin_mist, 0)
 
 # HEATER TOP
 if t_avg > 0 and tempC < cold_min_temp and tempW < target_temp:
@@ -179,13 +179,13 @@ else:
     setCtrl(pin_lamp, 0)
 
 # GET CONTROLS STATUSES
-c_heater = getCtrl(pin_heater)
-c_humidifier = getCtrl(pin_humidifier)
+c_heat = getCtrl(pin_heat)
+c_mist = getCtrl(pin_mist)
 c_lamp = getCtrl(pin_lamp)
 c_htop = getCtrl(pin_htop)
 
 # OUTPUT
-print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heater, c_humidifier, c_lamp, c_htop
+print ts, ts_diff, t_cold, h_cold, t_warm, h_warm, t_room, h_room, c_heat, c_mist, c_lamp, c_htop
 
 # SEND DATA
 try:
@@ -203,9 +203,9 @@ try:
         {   'resource': 't_room',   'data': round(float(t_room),1) },
         {   'resource': 't_avg',    'data': t_avg },
 
-        {   'resource': 'c_heater',     'data': c_heater },
-        {   'resource': 'c_humidifier', 'data': c_humidifier },
-        {   'resource': 'c_lamp',       'data': c_lamp }
+        {   'resource': 'c_heat',   'data': c_heat },
+        {   'resource': 'c_mist',   'data': c_mist },
+        {   'resource': 'c_lamp',   'data': c_lamp }
     ])
 
 except:
@@ -213,7 +213,7 @@ except:
     #buzz_time += 1
 
 
-if(buzz_time > 0):
+if buzz_time > 0:
     buzz(buzz_time)
     setCtrl(pin_warn, 1)
 else:
