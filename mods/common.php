@@ -35,8 +35,6 @@ class Sensor {
 		$this->timestamp	= strtotime(array_shift($data));
 		$this->work 		= array_shift($data);
 
-		//foreach($data as $k => $v)
-		//	if(0 == $k%2)
 		for($i = 0; $i < 6; $i+=2)
 			$this->data[] = (object)array('T' => (float)$data[$i], 'H' => (float)$data[$i+1]);
 
@@ -44,15 +42,6 @@ class Sensor {
 		$this->humidifier = (int)$data[7];
 		$this->lamp = isset($data[8]) ? (int)$data[8] : 0;
 		$this->htop = isset($data[9]) ? (int)$data[9] : 0;
-
-		/*
-		if(4 == count($this->data))
-		{
-			$tmp = array_pop($this->data);
-			$this->heater = $tmp->T;
-			$this->humidifier = $tmp->H;
-		}
-		*/
 	}
 
 }	// end of class

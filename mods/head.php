@@ -52,13 +52,13 @@ header('Content-Type: text/html; charset=UTF-8', true);
 
 		#info {font-size:1.2em;color:white;text-shadow: 1px 1px 0 red;font-weight:bold;}
 		#info span {white-space:nowrap;margin-right:.2em;position:relative;top:-10px;padding:2px 7px;border-radius:5px;box-shadow:1px 1px 1px #444;background-image:linear-gradient(to bottom,#3c3c3c 0,#222 100%);background-repeat:repeat-x;}
-		#info span.on {/*text-decoration:underline;*/background-color:#AA4444;background-image:linear-gradient(to bottom,#FF0000 0,#660000 100%);background-repeat:repeat-x;}
+		#info span.on {background-color:#AA4444;background-image:linear-gradient(to bottom,#FF0000 0,#660000 100%);background-repeat:repeat-x;}
 		#info span:before {text-shadow:none;font-weight:normal;}
 		#info span.temp:before {content:"tAvg: ";}
 		#info span.hmdt:before {content:"hAvg: ";}
 		#info span.heat:before {content:"heat";}
 		#info span.lamp:before {content:"lamp";}
-		#info span.htop:before {content:"hTop";}
+		#info span.htop:before {content:"htop";}
 		#info span.mist:before  {content:"mist";}
 		#info span.next:before {content:"";}
 
