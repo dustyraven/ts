@@ -48,6 +48,21 @@ function reData()
 		$("#hmdtC").css("width", hc + '%').find("b").text(data.last.hc);
 		$("#hmdtR").css("width", hr + '%').find("b").text(data.last.hr);
 
+		$("#tempH").parent().find(".min").css("left", percRange(data.settings.temperature.warm_min, 15, 40)-1 + "%");
+		$("#tempH").parent().find(".max").css("left", percRange(data.settings.temperature.warm_max, 15, 40)-1 + "%");
+		$("#tempC").parent().find(".min").css("left", percRange(data.settings.temperature.cold_min, 15, 40)-1 + "%");
+		$("#tempC").parent().find(".max").css("left", percRange(data.settings.temperature.cold_max, 15, 40)-1 + "%");
+		$("#tempR").parent().find(".min").css("left", percRange(data.settings.temperature.room_min, 15, 40)-1 + "%");
+		$("#tempR").parent().find(".max").css("left", percRange(data.settings.temperature.room_max, 15, 40)-1 + "%");
+
+		$("#hmdtH").parent().find(".min").css("left", percRange(data.settings.humidity.warm_min, 20, 100)-1 + "%");
+		$("#hmdtH").parent().find(".max").css("left", percRange(data.settings.humidity.warm_max, 20, 100)-1 + "%");
+		$("#hmdtC").parent().find(".min").css("left", percRange(data.settings.humidity.cold_min, 20, 100)-1 + "%");
+		$("#hmdtC").parent().find(".max").css("left", percRange(data.settings.humidity.cold_max, 20, 100)-1 + "%");
+		$("#hmdtR").parent().find(".min").css("left", percRange(data.settings.humidity.room_min, 20, 60)-1 + "%");
+		$("#hmdtR").parent().find(".max").css("left", percRange(data.settings.humidity.room_max, 20, 60)-1 + "%");
+
+
 
 		$(".progress-bar").each(function( index ) {
 			$(this).removeClass("progress-bar-success progress-bar-info progress-bar-warning progress-bar-danger")

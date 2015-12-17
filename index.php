@@ -81,12 +81,18 @@ include 'mods/head.php';
 
 			<div class="progress">
 				<div id="tempH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b></div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 			<div class="progress">
 				<div id="tempC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b></div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 			<div class="progress">
 				<div id="tempR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b></div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 		</div>
 	</div>
@@ -99,12 +105,18 @@ include 'mods/head.php';
 		<div class="col-xs-12">
 			<div class="progress">
 				<div id="hmdtH" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Warm <b></b>%</div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 			<div class="progress">
 				<div id="hmdtC" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Cold <b></b>%</div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 			<div class="progress">
 				<div id="hmdtR" class="progress-bar progress-bar-striped" role="progressbar" style="width:0%">Room <b></b>%</div>
+				<div class="divider min"></div>
+				<div class="divider max"></div>
 			</div>
 		</div>
 	</div>
@@ -121,7 +133,6 @@ include 'mods/head.php';
 
 	<script src="./js/jquery.min.js"></script>
 	<script src="./js/bootstrap.min.js"></script>
-	<script src="./js/howler.min.js"></script>
 	<?php include 'mods/javascript.php';?>
 
 </body>

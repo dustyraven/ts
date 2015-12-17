@@ -64,12 +64,16 @@ header('Content-Type: text/html; charset=UTF-8', true);
 
 		.sep {height:1.5em;border-top:1px dotted #444;}
 
-		.progress {height:28px;text-shadow: 1px 1px 1px black, -1px -1px 1px black;font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
+		.progress {position:relative;height:28px;text-shadow: 1px 1px 1px black, -1px -1px 1px black;font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
 		.progress-bar {font-size:26px;line-height:30px;text-align:left;padding-left:.5em;background-color:#AAA;white-space:nowrap;}
 		.progress-bar-success {background-color:green;}
 		.progress-bar-info {background-color:blue;}
 		.progress-bar-warning {background-color:yellow;}
 		.progress-bar-danger {background-color:red;}
+
+		.progress .divider {position:absolute;top:-25%;left:0;color:red;font-size: 1.825em;text-shadow:1px 1px 1px black;}
+		.progress .divider.min {color:blue;}
+		.progress .divider:after {content: "|"}
 
 		 .highcharts-tooltip {font-family:Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;}
 

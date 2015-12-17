@@ -52,7 +52,7 @@ $settings = parse_ini_file('terrasens.ini', true);
 foreach($settings as $k => $v)
 	foreach($v as $kk => $vv)
 		if(is_numeric($vv))
-			$settings[$k][$kk] = (int)$vv;
+			$settings[$k][$kk] = strpos($vv, '.') ? (float)$vv : (int)$vv;
 
 $log = 'logs/'.date('Ymd').'.log';
 
