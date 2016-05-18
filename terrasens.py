@@ -108,6 +108,15 @@ buzz_time = 0
 
 # ACTION
 
+
+if ts_start.hour > 8 and ts_start.hour < 22:
+    cold_min_temp += 1
+    cold_max_temp += 1
+    warm_min_temp += 1
+    warm_max_temp += 1
+    target_temp += 1
+
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -154,30 +163,20 @@ ts_diff = '{0:0.3f}'.format((ts_end - ts_start).total_seconds())
 ts = ts_start.strftime("%Y%m%d%H%M%S")
 
 
-
-# HEATER
-if tempW > 0 and tempW < target_temp:
-    setCtrl(pin_heat, 1)
-else:
-    setCtrl(pin_heat, 0)
-
 # HUMIDIFIER
-if h_avg > 0 and h_avg < target_hmdt:
-    setCtrl(pin_mist, 1)
-else:
-    setCtrl(pin_mist, 0)
-
+mist_on = int( h_avg > 0 and h_avg < target_hmdt )
+# HEATER 
+heat_on = int( tempW > 0 and tempW < target_temp )
 # HEATER TOP
-if t_avg > 0 and tempC < cold_min_temp and tempW < target_temp:
-    setCtrl(pin_htop, 1)
-else:
-    setCtrl(pin_htop, 0)
-
+htop_on = int( t_avg > 0 and tempC < cold_min_temp and tempW < target_temp )
 # LAMP
-if t_avg > 0 and tempC <= cold_min_temp and tempW <= warm_min_temp and 0 == now().minute % lamp_freq:
-    setCtrl(pin_lamp, 1)
-else:
-    setCtrl(pin_lamp, 0)
+lamp_on = int( t_avg > 0 and tempC <= cold_min_temp and tempW <= warm_min_temp and 0 == now().minute % lamp_freq )
+
+# DO SET
+setCtrl(pin_mist, mist_on)
+setCtrl(pin_heat, heat_on)
+setCtrl(pin_htop, htop_on)
+setCtrl(pin_lamp, lamp_on)
 
 # GET CONTROLS STATUSES
 c_heat = getCtrl(pin_heat)
